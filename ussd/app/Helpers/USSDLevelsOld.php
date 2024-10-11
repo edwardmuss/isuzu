@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: elm
@@ -9,14 +10,13 @@
 namespace App\Helpers;
 
 
-class USSDLevels
+class USSDLevelsOld
 {
-    public static function levelZero(){
+    public static function levelZero() {}
 
-    }
-
-    public static function levelOne($string){
-        switch ($string){
+    public static function levelOne($string)
+    {
+        switch ($string) {
             case 1:
                 return USSDPages::pageOne();
                 break;
@@ -49,9 +49,10 @@ class USSDLevels
         }
     }
 
-    public static function levelTwo($implode, $explode){
-        $sub_string = substr($implode, 0 , 2);
-        switch ($sub_string){
+    public static function levelTwo($implode, $explode)
+    {
+        $sub_string = substr($implode, 0, 2);
+        switch ($sub_string) {
             case "1":
                 return self::levelTwoOne($explode);
                 break;
@@ -81,8 +82,9 @@ class USSDLevels
         }
     }
 
-    public static function levelTwoOne($explode){
-        switch ($explode[1]){
+    public static function levelTwoOne($explode)
+    {
+        switch ($explode[1]) {
             case 1:
                 return USSDPages::pageOneOne();
                 break;
@@ -97,8 +99,9 @@ class USSDLevels
         }
     }
 
-    public static function levelTwoTwo($explode){
-        switch ($explode[1]){
+    public static function levelTwoTwo($explode)
+    {
+        switch ($explode[1]) {
             case 1:
                 return USSDPages::pageTwoOne();
                 break;
@@ -107,12 +110,14 @@ class USSDLevels
         }
     }
 
-    public static function levelTwoThree($explode){
+    public static function levelTwoThree($explode)
+    {
         return USSDPages::pageThreeOne();
     }
 
-    public static function levelTwoFour($explode){
-        switch ($explode[1]){
+    public static function levelTwoFour($explode)
+    {
+        switch ($explode[1]) {
             case 1:
                 return USSDPages::pageFourOne();
                 break;
@@ -124,16 +129,13 @@ class USSDLevels
         }
     }
 
-    public static function levelTwoFive($explode){
+    public static function levelTwoFive($explode) {}
 
-    }
+    public static function levelTwoSix($explode) {}
 
-    public static function levelTwoSix($explode){
-
-    }
-
-    public static function levelTwoSeven($explode){
-        switch ($explode[1]){
+    public static function levelTwoSeven($explode)
+    {
+        switch ($explode[1]) {
             case 1:
                 return USSDPages::pageName();
                 break;
@@ -163,8 +165,9 @@ class USSDLevels
         }
     }
 
-    public static function levelTwoEight($explode){
-        switch ($explode[1]){
+    public static function levelTwoEight($explode)
+    {
+        switch ($explode[1]) {
             case 1:
                 return USSDPages::pageNxxame();
                 break;

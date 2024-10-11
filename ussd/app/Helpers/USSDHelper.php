@@ -87,9 +87,6 @@ class USSDHelper
             return self::nrbTest(substr($ussd_string, 3), $msisdn, $code, $session);
         }
 
-        if (count($exploded_string) > 0 && $exploded_string[0] == 20) {
-            return self::nrbTest(substr($ussd_string, 3), $msisdn, $code, $session);
-        }
         $response =  self::pageSelector($level, $modifiable_string, $exploded_string, $msisdn);
         UssdUser::create([
             'msisdn' => $msisdn,
