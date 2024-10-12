@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -13,11 +11,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-$router->post('/', 'HomeController@index');
+$router->get('/', 'HomeController@index');
 $router->get('/test', 'HomeController@test');
 
 $router->post('/', 'PortalController@sendQuotePdf');
-
-Route::options('/{any:.*}', function () {
-    return response(['status' => 'success']);
-});
