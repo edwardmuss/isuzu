@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: elm
- * Date: 2019-09-02
- * Time: 13:59
- */
-
 namespace App\Helpers;
 
 
@@ -1202,6 +1195,31 @@ class USSDPages
     {
         return self::page1112111($decoded_string, $phone);
     }
+
+    // //1*1*1*1
+    // public static function page1213($decoded_string, $phone)
+    // {
+    //     return 'CON Enter your ID';
+    // }
+    // //1*1*1*1*1
+    // public static function page12131($decoded_string, $phone)
+    // {
+    //     return 'CON Enter your ID 2';
+    // }
+    // //1*1*1*1*1*1
+    // public static function page121311($decoded_string, $phone)
+    // {
+    //     return 'CON Enter your ID 3';
+    // }
+
+    // public static function page1213111($decoded_string, $phone)
+    // {
+    //     // return 'Hello';
+    //     $x = $decoded_string[count($decoded_string) - 3];
+    //     $y = $decoded_string[count($decoded_string) - 2];
+    //     $z = $decoded_string[count($decoded_string) - 1];
+    //     return $z;
+    // }
 
 
     //1*1*2

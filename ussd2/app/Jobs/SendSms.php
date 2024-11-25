@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: elm
@@ -37,20 +38,21 @@ class SendSms extends Job
     public function handle()
     {
         $client = new Client();
-        $result = $client->post('http://api.bizsms.co.ke/submit1.php', [
+        $result = $client->post('http://api.bizsms.co.ke/submit1.php3', [
             RequestOptions::JSON => [
-                "AuthDetails"=>[array(
-                    "UserID"=>535,
-                    "Token"=>md5('gmea123'),
-                    "Timestamp"=>date("Ymdhis")
-                )
+                "AuthDetails" => [
+                    array(
+                        "UserID" => 535,
+                        "Token" => md5('gmea123'),
+                        "Timestamp" => date("Ymdhis")
+                    )
                 ],
-                "SubAccountID"=>[0],
-                "MessageType"=>[3],
-                "BatchType"=>[0],
-                "SourceAddr"=>["Isuzu_EA"],
-                "MessagePayload"=>[array("Text"=>$this->message)],
-                "DestinationAddr"=>[array("MSISDN"=>$this->msisdn, "LinkID"=>"", "SourceID"=>"101")]
+                "SubAccountID" => [0],
+                "MessageType" => [3],
+                "BatchType" => [0],
+                "SourceAddr" => ["Isuzu_EA"],
+                "MessagePayload" => [array("Text" => $this->message)],
+                "DestinationAddr" => [array("MSISDN" => $this->msisdn, "LinkID" => "", "SourceID" => "101")]
             ]
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use App\Models\MenuOption;
 use App\Helpers\USSDHelper;
@@ -26,14 +27,20 @@ class UssdController extends Controller
             $phoneNumber = $request->input('phoneNumber');
             $text = $request->input('text'); // This will contain the user input
 
-            $page = USSDHelper::processUssd($text, $phoneNumber, $serviceCode, $sessionId);
-            // $page = USSDHelper::processUssd($ussd_string, $msisdn, $code, $session_id);
+            // $page = USSDHelper::processUssd($text, $phoneNumber, $serviceCode, $sessionId);
+            $page = USSDHelper::processUssd($ussd_string, $msisdn, $code, $session_id);
 
             Log::info($request->all());
             return $page;
         } catch (Exception $ex) {
             Log::error($ex->getMessage());
         }
+    }
+
+    function test()
+    {
+        $pdf = Pdf::loadHTML('<h1>Hello World</h1>');
+        return $pdf->download('test.pdf');
     }
 
     public function handleUssdRequest(Request $request)

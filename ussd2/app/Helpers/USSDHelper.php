@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: elm
- * Date: 2019-09-02
- * Time: 12:35
- */
-
 namespace App\Helpers;
 
 
@@ -145,7 +138,7 @@ class USSDHelper
     public static function sendQuoteMessage($destination, $model, $name, $email)
     {
         $message = "Dear $name,\nWe have received your request for ISUZU $model->key, Retail price is Ksh. $model->f_value. Kindly check your email $email for a quote for the same. Thank you.";
-        dispatch(new SendSms($message, $destination));
+        // dispatch(new SendSms($message, $destination));
     }
 
     public static function sendQuotePopUp($name, $email, $model)
