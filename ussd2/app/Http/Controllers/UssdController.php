@@ -27,8 +27,8 @@ class UssdController extends Controller
             $phoneNumber = $request->input('phoneNumber');
             $text = $request->input('text'); // This will contain the user input
 
-            // $page = USSDHelper::processUssd($text, $phoneNumber, $serviceCode, $sessionId);
-            $page = USSDHelper::processUssd($ussd_string, $msisdn, $code, $session_id);
+            $page = USSDHelper::processUssd($text, $phoneNumber, $serviceCode, $sessionId);
+            // $page = USSDHelper::processUssd($ussd_string, $msisdn, $code, $session_id);
 
             Log::info($request->all());
             return $page;
