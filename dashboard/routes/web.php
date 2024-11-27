@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VehicleSeriesModelsController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,6 +15,7 @@
 */
 
 /*Auth::routes();*/
+
 Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 Route::post('login', 'Auth\LoginController@login');
 Route::post('logout', 'Auth\LoginController@logout')->name('logout');
@@ -38,9 +42,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/psv-awards', 'PsvAwardsController');
     Route::resource('/offers', 'OffersController');
 
-
     Route::get('index/counts', 'HomeController@allcounts');
     Route::get('index/cabs', 'HomeController@pickups');
     Route::get('index/cabs-yearly', 'HomeController@pickupYearly');
     Route::get('index/vehicle-yearly', 'HomeController@vehicleSales');
+
+    Route::resource('vehicle-series', VehicleSeriesModelsController::class);
+    Route::post('vehicle-series/upload', [VehicleSeriesModelsController::class, 'upload'])->name('vehicle-series.upload');
 });
