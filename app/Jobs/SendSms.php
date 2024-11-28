@@ -38,7 +38,7 @@ class SendSms extends Job
     public function handle()
     {
         $client = new Client();
-        $result = $client->post('http://api.bizsms.co.ke/submit1.php3', [
+        $result = $client->post('http://api.bizsms.co.ke/submit1.php', [
             RequestOptions::JSON => [
                 "AuthDetails" => [
                     array(
@@ -55,5 +55,6 @@ class SendSms extends Job
                 "DestinationAddr" => [array("MSISDN" => $this->msisdn, "LinkID" => "", "SourceID" => "101")]
             ]
         ]);
+        \Log::info(json_encode($result));
     }
 }

@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
 use PDF;
 use App\Exports\Excel;
 use App\Helpers\DbHelper;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel as Exc;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Admin\VehicleSeriesModel;
 use App\Imports\VehicleSeriesModelsImport;
+use Maatwebsite\Excel\Facades\Excel as Exc;
 
 class VehicleSeriesModelsController extends Controller
 {

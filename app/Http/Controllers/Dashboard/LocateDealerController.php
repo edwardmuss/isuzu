@@ -1,49 +1,43 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
 use PDF;
 use App\Exports\Excel;
 use App\Helpers\DbHelper;
 use Illuminate\Http\Request;
-use App\Exports\VehicleSales;
-use App\Models\Admin\VehicleSale;
+use App\Models\Admin\LocateDealer;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
+use App\Http\Controllers\Controller;
 
-class VehicleSaleController extends Controller
+class LocateDealerController extends Controller
 {
-
-    public function __construct()
-    {
-        View::share("vehicle_sales", true);
-    }
     /**
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @param VehicleSale $model
+     * @param LocateDealer $model
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, VehicleSale $model)
+    public function index(Request $request, LocateDealer $model)
     {
-
         $filters = $request->all();
-        $vehicleSale = DbHelper::create_query($model, $filters);
+        $locate_dealer = DbHelper::create_query($model, $filters);
 
         //if its an export
         if (isset($request->export)) {
-            $vehicleSale = $vehicleSale->sortable()->get();
+            $locate_dealer = $locate_dealer->sortable(['id' => 'desc'])->get();
             if ($request->export == 'pdf') {
-                $pdf =  PDF::loadView('vehicle_sale._table', ['vehicle-sale' => $vehicleSale])->setPaper('a4', 'portrait');
-                return $pdf->stream('vehicle-sales.pdf');
+                $pdf =  PDF::loadView('locate_dealer._table', ['locate_dealer' => $locate_dealer])->setPaper('a4', 'portrait');
+                return $pdf->stream('locate_dealer.pdf');
             }
             if ($request->export == 'excel') {
-                return (new Excel($filters, $model))->download('vehicle_sales.xlsx');
+                return (new Excel($filters, $model))->download('locate_dealer.xlsx');
             }
         }
-        $vehicleSale = $vehicleSale->sortable(['ID' => 'desc'])->paginate(10);
-        return view('vehicle_sale.index', compact('vehicleSale', 'filters'));
+        $locate_dealer = $locate_dealer->where('contact_id', 5);
+        $locate_dealer = $locate_dealer->sortable(['id' => 'desc'])->paginate(20);
+        return view('locate_dealer.index', compact('locate_dealer', 'filters'));
     }
 
     /**
@@ -98,9 +92,7 @@ class VehicleSaleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        unset($request['_token']);
-        unset($request['_method']);
-        DB::table('trequestquote')->where("ID", $id)->update($request->all());
+        DB::table('tcontactreq')->where("id", $id)->update(['comment' => $request->comment]);
         //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
         return redirect()->back();
     }
@@ -114,13 +106,5 @@ class VehicleSaleController extends Controller
     public function destroy($id)
     {
         //
-    }
-
-
-    public function change(Request $request)
-    {
-        DB::table('trequestquote')->where("ID", $request->id)->update($request->all());
-        //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
-        return redirect()->back();
     }
 }

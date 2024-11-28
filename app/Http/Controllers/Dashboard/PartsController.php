@@ -1,49 +1,42 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
-use PDF;;
-
+use PDF;
 use App\Exports\Excel;
 use App\Helpers\DbHelper;
-use App\Exports\UssdUsers;
+use App\Models\Admin\Part;
 use Illuminate\Http\Request;
-use App\Models\Admin\UssdUser;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
+use App\Http\Controllers\Controller;
 
-class UssdUserController extends Controller
+class PartsController extends Controller
 {
-
-    public function __construct()
-    {
-        View::share("ussd_users", true);
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @param UssdUser $user
+     * @param Part $model
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, UssdUser $user)
+    public function index(Request $request, Part $model)
     {
         $filters = $request->all();
-        $users = DbHelper::create_query($user, $filters);
+        $parts = DbHelper::create_query($model, $filters);
+
         //if its an export
         if (isset($request->export)) {
-            $users = $users->sortable(['ID' => 'desc'])->take(10)->get();
+            $parts = $parts->sortable(['id' => 'desc'])->get();
             if ($request->export == 'pdf') {
-                $pdf =  PDF::loadView('ussd_users._table', ['users' => $users])->setPaper('a4', 'portrait');
-                return $pdf->stream('ussd_users.pdf');
+                $pdf =  PDF::loadView('parts._table', ['parts' => $parts])->setPaper('a4', 'portrait');
+                return $pdf->stream('parts.pdf');
             }
             if ($request->export == 'excel') {
-                return (new Excel($filters, $user))->download('ussd_users.xlsx');
+                return (new Excel($filters, $model))->download('parts.xlsx');
             }
         }
-        $users = $users->sortable(['ID' => 'desc'])->paginate(20);
-        return view('ussd_users.index', compact('users', 'filters'));
+        $parts = $parts->sortable(['id' => 'desc'])->paginate(20);
+        return view('parts.index', compact('parts', 'filters'));
     }
 
     /**
@@ -59,7 +52,7 @@ class UssdUserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -70,7 +63,7 @@ class UssdUserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -81,7 +74,7 @@ class UssdUserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -92,13 +85,15 @@ class UssdUserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        DB::table('tussdusers')->where("ID", $id)->update(['comment' => $request->comment]);
+        unset($request['_token']);
+        unset($request['_method']);
+        DB::table('tpartsreq')->where("id", $id)->update($request->all());
         //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
         return redirect()->back();
     }
@@ -106,11 +101,18 @@ class UssdUserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         //
+    }
+
+    public function change(Request $request)
+    {
+        DB::table('tpartsreq')->where("id", $request->id)->update($request->all());
+        //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
+        return redirect()->back();
     }
 }

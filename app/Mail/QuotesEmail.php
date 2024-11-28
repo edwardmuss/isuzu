@@ -37,7 +37,7 @@ class QuotesEmail extends Mailable
 
     public function build()
     {
-        $pdf = PDF::loadView('text_v2', [
+        $pdf = PDF::loadView('emails.quote.text_v2', [
             'model' => $this->model,
             'details' => $this->details,
             'name' => $this->name,
@@ -47,8 +47,8 @@ class QuotesEmail extends Mailable
             'image' => $this->image
         ]);
         $pdf->save(base_path("storage/quotes/S" . $this->quote . ".pdf"));
-        $subject = "ISUZU " . $this->model->key . " Quote";
-        return $this->view('emails.welcome')->subject($subject)
+        $subject = "ISUZU " . $this->model->new_model_name_customer . " Quote";
+        return $this->view('emails.quote.welcome')->subject($subject)
             ->attach(base_path("storage/quotes/S" . $this->quote . ".pdf"));
     }
 }

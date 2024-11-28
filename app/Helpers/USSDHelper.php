@@ -21,6 +21,7 @@ use App\Models\UssdUser;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Mail\QuotesEmail;
+use App\Models\Admin\LocateDealer;
 use Illuminate\Support\Facades\Mail;
 
 class USSDHelper
@@ -93,34 +94,19 @@ class USSDHelper
         return "END ERROR";
     }
 
-    // public static function pageSelector($level, $temp_string, $decoded_string, $msisdn)
-    // {
-    //     $imploded = "";
-    //     foreach ($temp_string as $input) {
-    //         if (is_numeric($input))
-    //             $imploded .= $input;
-    //         else
-    //             $imploded .= 1;
-    //     }
-    //     // $input = 'page' . substr($imploded, 5, 1);
-    //     $page = 'page' . substr($imploded, 0, $level);
-    //     //dd($page);
-    //     return USSDPages::$page($decoded_string, $msisdn);
-    // }
-
     public static function pageSelector($level, $temp_string, $decoded_string, $msisdn)
     {
-        // Implode the user inputs (e.g., *1*1*1 becomes 111)
         $imploded = "";
         foreach ($temp_string as $input) {
-            $imploded .= is_numeric($input) ? $input : '1';
+            if (is_numeric($input))
+                $imploded .= $input;
+            else
+                $imploded .= 1;
         }
-
-        // Determine the current page using the level
-        $pageIdentifier = substr($imploded, 0, $level);
-
-        // Dynamically call the appropriate page based on the page identifier
-        return USSDPages::generateDynamicPage($pageIdentifier, $decoded_string, $msisdn);
+        // $input = 'page' . substr($imploded, 5, 1);
+        $page = 'page' . substr($imploded, 0, $level);
+        //dd($page);
+        return USSDPages::$page($decoded_string, $msisdn);
     }
 
     public static function validateName($name)
@@ -152,8 +138,8 @@ class USSDHelper
 
     public static function sendQuoteMessage($destination, $model, $name, $email)
     {
-        $message = "Dear $name,\nWe have received your request for ISUZU $model->key, Retail price is Ksh. $model->f_value. Kindly check your email $email for a quote for the same. Thank you.";
-        // dispatch(new SendSms($message, $destination));
+        $message = "Dear $name,\nWe have received your request for ISUZU $model->new_model_name_customer, Retail price is Ksh. $model->price. Kindly check your email $email for a quote for the same. Thank you.";
+        dispatch(new SendSms($message, $destination));
     }
 
     public static function sendQuotePopUp($name, $email, $model)
@@ -167,9 +153,9 @@ class USSDHelper
         RequestQuote::create([
             'client_name' => $name,
             'client_msisdn' => $phone,
-            'quote_name' => "ISUZU $model->key",
+            'quote_name' => "ISUZU $model->new_model_name_customer",
             'quote_number' => $quote,
-            'amount' => $model->value,
+            'amount' => $model->amount,
             'email_ad' => $email,
             'created_at' => Carbon::now()->toDateTimeString()
         ]);
@@ -243,6 +229,19 @@ class USSDHelper
         ]);
     }
 
+    public static function sendContactRequestEmail($email, $name, $phone, $subject, $body, $location, $contact_id): void
+    {
+        LocateDealer::create([
+            'contact_id' => $contact_id,
+            'client_name' => $name,
+            'client_email' => $email,
+            'msisdn' => $phone,
+            'location' => $location,
+            'created_at' => Carbon::now()->toDateTimeString()
+        ]);
+        dispatch(new SendServiceEmailJob($email, $name, $phone, $subject, $body));
+    }
+
     public static function sendTechnicalAssistanceEmail($email)
     {
         dispatch(new SendTechnicalAssistanceEmailJob($email));
@@ -306,5 +305,87 @@ class USSDHelper
         Log::info(" | Took | " . $info['total_time'] . " | seconds to receive a response, status code - | " . $http_code . " |  session_id  | " . $session . "|  msisdn | " . $msisdn);
         curl_close($ch);
         return $result;
+    }
+
+    public static function convertNumberToWord($number)
+    {
+        $words = [
+            1 => "One",
+            2 => "Two",
+            3 => "Three",
+            4 => "Four",
+            5 => "Five",
+            6 => "Six",
+            7 => "Seven",
+            8 => "Eight",
+        ];
+
+        return $words[$number] ?? $number; // Fallback to the number itself if no match
+    }
+
+    // Function to display the main menu
+    public static function displayMainMenu()
+    {
+        $response = $response = "CON Welcome to Isuzu EA:\n\n";
+        $response .= "1. Vehicle Sales\n";
+        $response .= "2. Book a Test Drive\n";
+        $response .= "3. Book a Service \n";
+        $response .= "4. Vehicle Parts\n";
+        $response .= "5. Contact Center\n";
+        $response .= "6. Locate Dealer\n";
+        $response .= "7. Brochures\n";
+        $response .= "8. MAXIT Loyalty\n";
+        return $response;
+    }
+
+    // public static function backMenu($exploded)
+    // {
+    //     //search for 0
+    //     $index = array_search("0", $exploded);
+    //     // remove relevant menu
+    //     if ($index >= 1) {
+    //         array_splice($exploded, $index - 1, 2);
+    //         $exploded = self::backMethod($exploded);
+    //     }
+    //     //print_r($exploded);
+    //     for ($i = 0; $i <= count($exploded); $i++) {
+    //         if (empty($exploded[$i]) || $exploded[$i] == 98)
+    //             unset($exploded[$i]);
+    //     }
+    //     return $exploded;
+    // }
+
+    // public static function mainMenu($exploded)
+    // {
+    //     //search for #
+    //     $index = array_search("#", $exploded);
+    //     // remove relevant menu
+    //     if ($index >= 1) {
+    //         array_splice($exploded, 0, $index + 1);
+    //         $exploded = self::backMethod($exploded);
+    //     }
+    //     //print_r($exploded);
+    //     for ($i = 0; $i <= count($exploded); $i++) {
+    //         if (empty($exploded[$i]))
+    //             unset($exploded[$i]);
+    //     }
+    //     return $exploded;
+    // }
+
+    public static function backMenu(array $textArray): array
+    {
+        if (end($textArray) === '0') {
+            array_pop($textArray); // Remove '0'
+            array_pop($textArray); // Go back one level
+        }
+        return $textArray;
+    }
+
+    public static function mainMenu(array $textArray): array
+    {
+        if (end($textArray) === '#') {
+            return []; // Reset to main menu
+        }
+        return $textArray;
     }
 }

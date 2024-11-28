@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
 use Carbon\Carbon;
 use App\Models\Admin\Part;
@@ -12,6 +12,7 @@ use App\Models\Admin\PsvAward;
 use App\Models\Admin\TestDrive;
 use App\Models\Admin\VehicleSale;
 use App\Models\Admin\LocateDealer;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Response;
 

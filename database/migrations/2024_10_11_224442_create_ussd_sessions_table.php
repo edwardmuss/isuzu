@@ -13,11 +13,9 @@ return new class extends Migration
     {
         Schema::create('ussd_sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('session_id');
+            $table->string('session_id')->unique();
             $table->string('phone_number');
-            $table->text('current_path')->nullable();; // Tracks where the user is in the menu
-            $table->json('menu_history')->nullable(); // Stores the history of menu paths
-            $table->json('user_data')->nullable(); // Stores temporary user data
+            $table->json('data')->nullable(); // Store session data as JSON
             $table->timestamps();
         });
     }

@@ -1,42 +1,50 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
-use PDF;
+use PDF;;
+
 use App\Exports\Excel;
 use App\Helpers\DbHelper;
+use App\Exports\UssdUsers;
 use Illuminate\Http\Request;
-use App\Models\Admin\LocateDealer;
+use App\Models\Admin\UssdUser;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\View;
 
-class LocateDealerController extends Controller
+class UssdUserController extends Controller
 {
+
+    public function __construct()
+    {
+        View::share("ussd_users", true);
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @param LocateDealer $model
+     * @param UssdUser $user
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, LocateDealer $model)
+    public function index(Request $request, UssdUser $user)
     {
         $filters = $request->all();
-        $locate_dealer = DbHelper::create_query($model, $filters);
-
+        $users = DbHelper::create_query($user, $filters);
         //if its an export
         if (isset($request->export)) {
-            $locate_dealer = $locate_dealer->sortable(['id' => 'desc'])->get();
+            $users = $users->sortable(['ID' => 'desc'])->take(10)->get();
             if ($request->export == 'pdf') {
-                $pdf =  PDF::loadView('locate_dealer._table', ['locate_dealer' => $locate_dealer])->setPaper('a4', 'portrait');
-                return $pdf->stream('locate_dealer.pdf');
+                $pdf =  PDF::loadView('ussd_users._table', ['users' => $users])->setPaper('a4', 'portrait');
+                return $pdf->stream('ussd_users.pdf');
             }
             if ($request->export == 'excel') {
-                return (new Excel($filters, $model))->download('locate_dealer.xlsx');
+                return (new Excel($filters, $user))->download('ussd_users.xlsx');
             }
         }
-        $locate_dealer = $locate_dealer->where('contact_id', 5);
-        $locate_dealer = $locate_dealer->sortable(['id' => 'desc'])->paginate(20);
-        return view('locate_dealer.index', compact('locate_dealer', 'filters'));
+        $users = $users->sortable(['ID' => 'desc'])->paginate(20);
+        return view('ussd_users.index', compact('users', 'filters'));
     }
 
     /**
@@ -52,7 +60,7 @@ class LocateDealerController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -63,7 +71,7 @@ class LocateDealerController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -74,7 +82,7 @@ class LocateDealerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -85,13 +93,13 @@ class LocateDealerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        DB::table('tcontactreq')->where("id", $id)->update(['comment' => $request->comment]);
+        DB::table('tussdusers')->where("ID", $id)->update(['comment' => $request->comment]);
         //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
         return redirect()->back();
     }
@@ -99,7 +107,7 @@ class LocateDealerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)

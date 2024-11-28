@@ -1,41 +1,43 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
 use PDF;
 use App\Exports\Excel;
 use App\Helpers\DbHelper;
-use App\Models\Admin\Offer;
 use Illuminate\Http\Request;
+use App\Models\Admin\LocateDealer;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
-class OffersController extends Controller
+class ContactController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
      * @param Request $request
-     * @param Offer $model
+     * @param  LocateDealer $model
+     *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, Offer $model)
+    public function index(Request $request, LocateDealer $model)
     {
         $filters = $request->all();
-        $offers = DbHelper::create_query($model, $filters);
+        $tech_assistance = DbHelper::create_query($model, $filters);
 
         //if its an export
         if (isset($request->export)) {
-            $offers = $offers->sortable(['id' => 'desc'])->get();
+            $tech_assistance = $tech_assistance->sortable(['id' => 'desc'])->get();
             if ($request->export == 'pdf') {
-                $pdf =  PDF::loadView('offers._table', ['offers' => $offers])->setPaper('a4', 'portrait');
-                return $pdf->stream('offers.pdf');
+                $pdf =  PDF::loadView('tech_assistance._table', ['tech_assistance' => $tech_assistance])->setPaper('a4', 'portrait');
+                return $pdf->stream('tech_assistance.pdf');
             }
             if ($request->export == 'excel') {
-                return (new Excel($filters, $model))->download('offers.xlsx');
+                return (new Excel($filters, $model))->download('tech_assistance.xlsx');
             }
         }
-        $offers = $offers->sortable(['id' => 'desc'])->paginate(20);
-        return view('offers.index', compact('offers', 'filters'));
+        $tech_assistance = $tech_assistance->where('contact_id', 4);
+        $tech_assistance = $tech_assistance->sortable(['id' => 'desc'])->paginate(20);
+        return view('contact.index', compact('tech_assistance', 'filters'));
     }
 
     /**
@@ -92,14 +94,13 @@ class OffersController extends Controller
     {
         unset($request['_token']);
         unset($request['_method']);
-        DB::table('tspecialoffers')->where("id", $id)->update($request->all());
+        DB::table('tcontactreq')->where("id", $id)->update($request->all());
         //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
         return redirect()->back();
     }
 
     /**
      * Remove the specified resource from storage.
-     *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -110,7 +111,7 @@ class OffersController extends Controller
 
     public function change(Request $request)
     {
-        DB::table('tspecialoffers')->where("id", $request->id)->update($request->all());
+        DB::table('tcontactreq')->where("id", $request->id)->update($request->all());
         //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
         return redirect()->back();
     }

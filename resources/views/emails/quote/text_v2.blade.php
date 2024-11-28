@@ -123,7 +123,7 @@
         </td>
     </tr>
 </table>
-@include('_includes._quotations_v2')
+@include('emails.quote._quotations_v2')
 
 <br>
 <br>

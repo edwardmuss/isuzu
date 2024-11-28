@@ -1,27 +1,21 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UssdController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\MenuOptionController;
-use App\Http\Controllers\VehicleSeriesModelsController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\UssdUserController;
-use App\Http\Controllers\VehicleSaleController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\PartsController;
-use App\Http\Controllers\TestDrivesController;
-use App\Http\Controllers\BrochureController;
-use App\Http\Controllers\LocateDealerController;
-use App\Http\Controllers\TechnicalController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\PsvAwardsController;
-use App\Http\Controllers\OffersController;
-
-Route::resource('menu_options', MenuOptionController::class);
-Route::post('/menuoptions/reorder', [MenuOptionController::class, 'reorder'])->name('menuoptions.reorder');
-Route::get('/menuoptions/{id}/edit', [MenuOptionController::class, 'edit2'])->name('menuoptions.edit');
-Route::get('/test', [UssdController::class, 'test']);
+use App\Http\Controllers\Dashboard\HomeController;
+use App\Http\Controllers\Dashboard\PartsController;
+use App\Http\Controllers\Dashboard\OffersController;
+use App\Http\Controllers\Dashboard\ContactController;
+use App\Http\Controllers\Dashboard\ServiceController;
+use App\Http\Controllers\Dashboard\BrochureController;
+use App\Http\Controllers\Dashboard\UssdUserController;
+use App\Http\Controllers\Dashboard\PsvAwardsController;
+use App\Http\Controllers\Dashboard\TechnicalController;
+use App\Http\Controllers\Dashboard\TestDrivesController;
+use App\Http\Controllers\Dashboard\VehicleSaleController;
+use App\Http\Controllers\Dashboard\LocateDealerController;
+use App\Http\Controllers\Dashboard\VehicleSeriesModelsController;
 
 /*Auth::routes();*/
 

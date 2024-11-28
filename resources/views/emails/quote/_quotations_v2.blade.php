@@ -15,14 +15,14 @@
     <tr>
         <td align="left">1</td>
         <td align="center">
-            <img src="{{ base_path("public/new_images/".$image) }}" alt="" width="150" style="margin-top: 20px"/>
+            <img src="{{ public_path('storage/' . $model->photo) }}" alt="" width="150" style="margin-top: 20px"/>
         </td>
-        <td align="left">{!! $details !!}</td>
+        <td align="left">{!! $model->description !!}</td>
         <td align="center">1</td>
-        <td align="center">{{number_format($model->original_value, 2, ".", ",")}}</td>
-        <td align="center">{{number_format(($model->original_value - $model->value), 2, ".", ",")}}</td>
-        <td align="center">{{number_format($model->value, 2, ".", ",")}}</td>
-        <td align="right"><strong>{{number_format($model->value, 2, ".", ",")}}</strong></td>
+        <td align="center">{{number_format($model->price, 2, ".", ",")}}</td>
+        <td align="center">{{number_format(($model->discount), 2, ".", ",")}}</td>
+        <td align="center">{{number_format($model->amount, 2, ".", ",")}}</td>
+        <td align="right"><strong>{{number_format($model->amount, 2, ".", ",")}}</strong></td>
     </tr>
     </tbody>
 </table>
@@ -78,7 +78,7 @@
         <td align="right" style="color: red;font-family:'Titillium Web', sans-serif;font-size: 13px">
             TOTAL AMOUNT <strong>(PRICES ARE DUTY AND VAT INCLUSIVE)</strong>:
                 <span class="elm-pad" style="padding: 10px;border: 1px solid red;color: red;font-size: 16px">
-                    KES: {{number_format((float)$model->value, 2, ".", ",")}}
+                    KES: {{number_format((float)$model->amount, 2, ".", ",")}}
                 </span>
         </td>
     </tr>

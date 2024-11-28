@@ -1,8 +1,11 @@
 <div style="font-family: Calibri, sans-serif">
     Dear {{$name}}<br><br>
-    Thank you for showing interest in the ISUZU {{$model->key}}.<br><br>
-    Herein attached is a copy of <strong>ISUZU {{$model->key}}</strong> quote for your review.<br><br>
+    Thank you for showing interest in the ISUZU {{ $model->new_model_name_customer }}.<br><br>
+    Herein attached is a copy of <strong>ISUZU {{ $model->new_model_name_customer }}</strong> quote for your review.<br><br>
     We look forward to doing business with you.<br><br>
+    <h4>Description</h4>
+    {!! $model->description !!}
+    <br>
     @if($signature)
         <span>
             Regards,<br><br>

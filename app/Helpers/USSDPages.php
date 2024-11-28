@@ -51,172 +51,29 @@ class USSDPages
     //1*1
     public static function page11($decoded_string, $phone)
     {
-        // Fetch distinct series from the database
-        $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-
-        // Start building the response for the series menu
         $response = "CON Choose a Vehicle Make: \n\n";
-
-        // Dynamically populate the series options
-        $index = 1;
-        foreach ($seriesList as $series) {
-            $response .= "$index. {$series->series}\n";
-            $index++;
-        }
-
-        // Add navigation options
+        $response .= "1. Isuzu mu-X\n";
+        $response .= "2. Isuzu Pickups\n";
+        $response .= "3. Isuzu 4.1-8.5 Tonne Truck\n";
+        $response .= "4. Isuzu Buses\n";
+        $response .= "5. Isuzu 11-26 Tonne Truck\n"; //this belongs to F Series menu
+        $response .= "6. GXZ60 Prime mover\n"; // E series menu initially
+        /* $response .= "6. Chevrolet\n"; */ // Stopped Chevrolet Sales for the moment
         $response .= "0: Back\n";
         $response .= "00: Main Menu\n";
-
         return $response;
     }
 
-    public static function page111($decoded_string, $phone)
+    // 1*1*1
+    public static function page111()
     {
-        // Decode the user's selection to get the series index
-        $seriesIndex = (int) $decoded_string; // For example, 1, 2, 3, etc.
-
-        // Fetch distinct series from the database
-        $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-
-        // Fetch the series name based on the index
-        $selectedSeries = $seriesList[$seriesIndex - 1]->series;
-
-        // Fetch models for the selected series
-        $models = VehicleSeriesModel::where('series', $selectedSeries)->get();
-
-        // Build the response dynamically
-        $response = "CON Choose Model for $selectedSeries: \n\n";
-        if ($models->isEmpty()) {
-            $response = "END No models available for the selected series.";
-        } else {
-            $index = 1;
-            foreach ($models as $model) {
-                $response .= "$index. {$model->new_model_name_customer}\n";
-                $index++;
-            }
-            $response .= "0: Back\n";
-        }
-
-        return $response;
-    }
-
-    public static function generateDynamicPage($pageIdentifier, $decoded_string, $msisdn)
-    {
-        // Break the identifier into its parts (e.g., *1*1*1 becomes [1, 1, 1])
-        $inputParts = str_split($pageIdentifier);
-
-        // Handle the different levels dynamically based on the number of parts in input
-        if (count($inputParts) === 1) {
-            // First level: Select Series
-            return self::handleSeriesSelection($decoded_string, $msisdn);
-        } elseif (count($inputParts) === 2) {
-            // Second level: Select Model within the Series
-            return self::handleModelSelection($decoded_string, $msisdn, $inputParts);
-        } elseif (count($inputParts) === 3) {
-            // Third level: Further details, if available
-            return self::handleModelDetails($decoded_string, $msisdn, $inputParts);
-        }
-        // Add more levels as needed based on your flow
-    }
-
-    public static function handleSeriesSelection($decoded_string, $msisdn)
-    {
-        // Fetch distinct series from the VehicleSeriesModel
-        $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-
-        // Check if the series list is empty
-        if ($seriesList->isEmpty()) {
-            return "END No vehicle series available at the moment.";
-        }
-
-        // Generate the response with available series
-        $response = "CON Choose a Vehicle Series: \n\n";
-        foreach ($seriesList as $index => $series) {
-            $response .= ($index + 1) . ". " . $series->series . "\n";
-        }
+        $response = "CON Choose Isuzu mu-X Model: \n\n";
+        $response .= "1. mu-X 1.9L RJ05\n";
+        $response .= "2. mu-X 3.0L RJ05\n";
         $response .= "0: Back\n";
         return $response;
     }
 
-    public static function handleModelSelection($decoded_string, $msisdn)
-    {
-        $t = $decoded_string;
-        // return json_encode($t);
-        // Check if $decoded_string is an array
-        if (is_array($decoded_string)) {
-            // If it's an array, implode it to create a string
-            $decoded_string = implode('*', $decoded_string);
-        }
-
-        // Extract the series index from the decoded string
-        $selection = explode('*', $decoded_string);
-
-        // Assuming the first part is the series index
-        $seriesIndex = $selection[0];
-
-        // Debug: Check the series index value
-        \Log::debug("Selected series index: " . $seriesIndex);
-
-        // Fetch the models for the selected series
-        $models = VehicleSeriesModel::where('series', $seriesIndex)->get();
-
-        // Debug: Check if any models were returned
-        \Log::debug("Models fetched: " . $models->count());
-
-        if ($models->isEmpty()) {
-            // If no models are found for the series, return a message
-            return "END No models available for this series.";
-        }
-
-        // Generate the response with available models
-        $response = "CON Choose a Model: \n\n";
-        foreach ($models as $index => $model) {
-            $response .= ($index + 1) . ". " . $model->new_model_name_customer . "\n";
-        }
-        $response .= "0: Back\n";
-
-        return $response;
-    }
-
-
-    public static function handleModelDetails($decoded_string, $msisdn)
-    {
-        // Extract the model selection from the decoded string (this is an example; adjust as needed)
-        $selection = explode('*', $decoded_string);
-
-        $series = $selection[0]; // series index
-        $model = $selection[1];  // model index
-
-        // Fetch the corresponding model
-        $modelDetails = VehicleSeriesModel::where('series', $series)
-            ->skip($model - 1)  // Since array starts from 0, we subtract 1
-            ->take(1)            // Fetch only one model
-            ->first();
-
-        if (!$modelDetails) {
-            return "END Invalid model selection.";
-        }
-
-        // Generate the response with model details
-        $response = "END You have selected the " . $modelDetails->new_model_name_customer . ".\n";
-        $response .= "Description: " . $modelDetails->description . "\n";
-        $response .= "Price: " . $modelDetails->price . "\n";
-        $response .= "Discount: " . $modelDetails->discount . "\n";
-        $response .= "Amount: " . $modelDetails->amount . "\n";
-
-        return $response;
-    }
-
-    //1*1*1
-    // public static function page111()
-    // {
-    //     $response = "CON Choose Isuzu mu-X Model: \n\n";
-    //     $response .= "1. mu-X 1.9L RJ05\n";
-    //     $response .= "2. mu-X 3.0L RJ05\n";
-    //     $response .= "0: Back\n";
-    //     return $response;
-    // }
     public static function page1111($decoded_string, $phone)
     {
         $price = Conf::where('key', 'mu-X 1.9L RJ05')->first();
@@ -2187,7 +2044,7 @@ class USSDPages
         $body = "Dear valued customer,<br/><br/>
                 Thank you for your enquiry on our contacts.<br/><br/>
                 We are commited to keep you moving, feel free to contact our contact center through our toll free number <strong>0800 724 724</strong>.<br/><br/>";
-        USSDHelper::sendPartsEmail($email, $name, $phone, $subject, $body, $location, null, null);
+        USSDHelper::sendContactRequestEmail($email, $name, $phone, $subject, $body, $location);
 
         return "END Thank you for your enquiry. We have sent you an email with the details requested.";
     }
@@ -2263,7 +2120,7 @@ class USSDPages
         $sms = "Dear $name,\nWe have received your Locate A Dealer request, we will get back to you shortly.";
         USSDHelper::sendMessage($phone, $sms);
         $body = "Thank you $name, we have received your Locate A Dealer request, we will get back to you shortly.<br/><br/>Insist on Genuine Isuzu Parts & Accessories and you will be insisting on value for money, safety and long lasting performance.<br/>";
-        USSDHelper::sendPartsEmail($email, $name, $phone, $subject, $body, $location, null, null);
+        USSDHelper::sendContactRequestEmail($email, $name, $phone, $subject, $body, $location, 5);
 
         return "END Thank you $name,\n we have received your Locate A Dealer request, we will get back to you shortly.";
     }

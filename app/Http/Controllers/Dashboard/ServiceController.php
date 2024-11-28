@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Dashboard;
 
 use PDF;
 use App\Exports\Excel;
@@ -8,6 +8,7 @@ use App\Helpers\DbHelper;
 use Illuminate\Http\Request;
 use App\Models\Admin\Service;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
 
