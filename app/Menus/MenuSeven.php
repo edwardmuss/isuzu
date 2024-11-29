@@ -6,13 +6,13 @@ use App\Helpers\USSDHelper;
 use App\Contracts\MenuHandlerInterface;
 use App\Models\Admin\VehicleSeriesModel;
 
-class MenuTwo implements MenuHandlerInterface
+class MenuSeven implements MenuHandlerInterface
 {
 
     public function handle(array $textArray, array &$sessionData, string $phoneNumber): string
     {
         $level = count($textArray);
-        $response = ""; // Ensure response is initialized
+        $response = ""; // Initialize the response
 
         if ($level == 1) {
             $response = $this->displaySeriesMenu();
@@ -31,7 +31,11 @@ class MenuTwo implements MenuHandlerInterface
             $seriesName = $sessionData['series'] ?? null;
 
             if ($seriesName) {
-                $models = VehicleSeriesModel::where('series', $seriesName)->get();
+                $models = VehicleSeriesModel::where('series', $seriesName)
+                    ->whereNotNull('brochure')
+                    ->where('brochure', '<>', '')
+                    ->get();
+
                 $selectedModelIndex = (int)$textArray[2] - 1;
 
                 if (isset($models[$selectedModelIndex])) {
@@ -64,40 +68,29 @@ class MenuTwo implements MenuHandlerInterface
                 $response .= "0: Back\n";
             } else {
                 $sessionData['email'] = $email;
-                $response = "CON Enter your location:\n";
-                $response .= "0: Back\n";
-            }
-        } elseif ($level == 6 && isset($textArray[5])) {
-            $location = trim($textArray[5]);
 
-            if (strlen($location) < 2 || !preg_match("/^[a-zA-Z\s]+$/", $location)) {
-                $response = "CON Invalid location name. Please enter a valid location name:\n";
-                $response .= "0: Back\n";
-            } else {
-                $sessionData['location'] = $location;
                 $model = (object)$sessionData['model'];
                 $name = $sessionData['name'];
-                $email = $sessionData['email'];
-                $description = $model->description;
-                $image = $model->photo;
+                $brochureLink = asset('storage/' . $model->brochure);
 
-                $title = $model->new_model_name_customer;
-                $subject = "Test Drive - $title";
-
-                $sms = "Dear <b>$name</b>,\nThank you for showing interest in $title, your request for a test drive has been received and we will get back to you shortly.";
+                // Sending SMS
+                $sms = "Thank you $name, We have received your Isuzu {$model->new_model_name_customer} brochure request, we will get back to you shortly.";
                 USSDHelper::sendMessage($phoneNumber, $sms);
-                $body = "Dear $name,<br/><br/>Thank you for showing interest in the <b>$title</b>.<br/><br/>Your request for a test drive has been received and we will get back to you shortly.<br/>";
-                USSDHelper::sendTestDriveEmail($email, $name, $phoneNumber, $title, $subject, $body, $location);
 
-                return "END Dear $name,\nThank you for showing interest in $title. Your request to book a test drive has been received and we will get back to you shortly.";
+                // Sending Email with Brochure
+                $subject = "{$model->new_model_name_customer} Brochure";
+                $body = "Dear $name,<br/><br/>
+                         Thank you for reaching out to us and expressing interest in the {$model->new_model_name_customer}.<br/><br/>
+                         Herein attached is a copy of your <strong>{$model->new_model_name_customer}</strong> brochure for your review.<br/>";
+                USSDHelper::sendBrochureEmail($email, $name, $phoneNumber, $subject, $body, $brochureLink);
 
-                $response = "END Thank you {$name}! We will send a quotation for {$model->new_model_name_customer} to {$email} shortly.";
+                $response = "END Thank you {$name}! A brochure for {$model->new_model_name_customer} has been sent to {$email}.";
             }
         } else {
             $response = "END Invalid input. Please try again.";
         }
 
-        return $response; // Return the response
+        return $response;
     }
 
 
@@ -105,7 +98,7 @@ class MenuTwo implements MenuHandlerInterface
     function displaySeriesMenu()
     {
         $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-        $response = "CON Book a Test Drive Vehicle Series: \n\n";
+        $response = "CON Brochure Request: Choose a Vehicle Series: \n\n";
         $index = 1;
 
         foreach ($seriesList as $series) {
@@ -118,16 +111,19 @@ class MenuTwo implements MenuHandlerInterface
         return $response;
     }
 
-    // Function to display the models sub-menu
+    // Function to display the models sub-menu (only models with brochures)
     function displayModelsMenu($seriesName)
     {
-        $models = VehicleSeriesModel::where('series', $seriesName)->get();
+        $models = VehicleSeriesModel::where('series', $seriesName)
+            ->whereNotNull('brochure')
+            ->where('brochure', '<>', '')
+            ->get();
 
         if ($models->isEmpty()) {
-            return "END No models available for this series.";
+            return "END No models with brochures available for this series.";
         }
 
-        $response = "CON Choose a Model: \n\n";
+        $response = "CON Choose a Model with a Brochure: \n\n";
         foreach ($models as $index => $model) {
             $response .= ($index + 1) . ". " . $model->new_model_name_customer . "\n";
         }

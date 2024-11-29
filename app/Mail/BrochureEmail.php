@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: elm
@@ -35,8 +36,9 @@ class BrochureEmail extends Mailable
         $this->file = $file;
     }
 
-    public function build(){
-        return $this->view('emails.welcome_v2')->subject($this->subject)->with(['body'=>$this->body, 'title'=>$this->subject])
-            ->attach(base_path("public/brochures/".$this->file));
+    public function build()
+    {
+        return $this->view('emails.welcome_v2')->subject($this->subject)->with(['body' => $this->body, 'title' => $this->subject])
+            ->attach($this->file);
     }
 }

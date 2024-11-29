@@ -57,10 +57,15 @@ class VehicleSeriesModelsController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'amount' => 'nullable|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Max size 2MB
+            'brochure' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120', // Max size 5MB
         ]);
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('vehicle_photos', 'public');
+        }
+
+        if ($request->hasFile('brochure')) {
+            $validated['brochure'] = $request->file('brochure')->store('vehicle_brochures', 'public');
         }
 
         VehicleSeriesModel::create($validated);
@@ -84,25 +89,32 @@ class VehicleSeriesModelsController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'amount' => 'nullable|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'brochure' => 'nullable|file|mimes:pdf|max:5120',
         ]);
 
-        $vehicleSeriesModel = VehicleSeriesModel::find($id);
+        $vehicleSeriesModel = VehicleSeriesModel::findOrFail($id);
 
+        // Handle photo upload and unlink
         if ($request->hasFile('photo')) {
-            // Delete old photo if it exists
             if ($vehicleSeriesModel->photo) {
                 Storage::disk('public')->delete($vehicleSeriesModel->photo);
             }
-
             $validated['photo'] = $request->file('photo')->store('vehicle_photos', 'public');
         }
 
-        $update = $vehicleSeriesModel->update($validated);
+        // Handle brochure upload and unlink
+        if ($request->hasFile('brochure')) {
+            if ($vehicleSeriesModel->brochure) {
+                Storage::disk('public')->delete($vehicleSeriesModel->brochure);
+            }
+            $validated['brochure'] = $request->file('brochure')->store('vehicle_brochures', 'public');
+        }
+
+        $vehicleSeriesModel->update($validated);
 
         return redirect()->route('vehicle-series.index')
             ->with('success', 'Vehicle series model updated successfully!');
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -110,10 +122,21 @@ class VehicleSeriesModelsController extends Controller
     public function destroy($id)
     {
         $vehicleSeries = VehicleSeriesModel::findOrFail($id);
+
+        // Delete associated photo and brochure files
+        if ($vehicleSeries->photo) {
+            Storage::disk('public')->delete($vehicleSeries->photo);
+        }
+
+        if ($vehicleSeries->brochure) {
+            Storage::disk('public')->delete($vehicleSeries->brochure);
+        }
+
         $vehicleSeries->delete();
 
-        return redirect()->route('vehicle-series.index')->with('success', 'Vehicle Series deleted successfully.');
+        return redirect()->route('vehicle-series.index')->with('success', 'Vehicle series model deleted successfully.');
     }
+
 
 
     public function upload(Request $request)

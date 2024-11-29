@@ -160,6 +160,12 @@
                         <label for="photo">Photo</label>
                         <input type="file" id="photo" name="photo" class="form-control">
                     </div>
+
+                    <!-- Brochure -->
+                    <div class="form-group mb-3">
+                        <label for="brochure">Brochure</label>
+                        <input type="file" id="brochure" name="brochure" class="form-control">
+                    </div>
                 </div>
                 <!-- Modal Footer -->
                 <div class="modal-footer">

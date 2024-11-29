@@ -330,7 +330,7 @@ class USSDHelper
         $response .= "1. Vehicle Sales\n";
         $response .= "2. Book a Test Drive\n";
         $response .= "3. Book a Service \n";
-        $response .= "4. Vehicle Parts\n";
+        $response .= "4. Parts and Accessories\n";
         $response .= "5. Contact Center\n";
         $response .= "6. Locate Dealer\n";
         $response .= "7. Brochures\n";

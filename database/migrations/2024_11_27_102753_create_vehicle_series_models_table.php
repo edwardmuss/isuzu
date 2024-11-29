@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('amount', 10, 2)->nullable();
             $table->string('photo')->nullable(); // Path to uploaded photos
+            $table->string('brochure')->nullable(); // Path to uploaded brochures
             $table->boolean('status')->default(1); // Active/Inactive
             $table->timestamps();
         });

@@ -11,6 +11,7 @@
             <th>Amount</th>
             <th>@sortablelink('created_at', 'Created At')</th>
             <th>Photo</th>
+            <th>Brochure</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -32,8 +33,13 @@
                 @endif
             </td>
             <td>
+                @if($data->brochure)
+                    <a class="btn btn-info btn-sm" href="{{ asset('storage/' . $data->brochure) }}" target="_blank" rel="noopener noreferrer">View</a>
+                @endif
+            </td>
+            <td>
                 <div class="d-inline-flex">
-                    <button type="button" class="btn btn-info btn-sm mb-1 mr-1" data-toggle="modal" data-target="#{{$data->id}}">
+                    <button type="button" class="btn btn-info btn-sm mb-1 mr-1 me-1" data-toggle="modal" data-target="#{{$data->id}}">
                         <i class="fa fa-edit"></i>
                     </button>
                     <form action="{{ route('vehicle-series.destroy', $data->id) }}" method="POST" style="display:inline;">
@@ -115,6 +121,15 @@
                                     <input type="file" id="photo" name="photo" class="form-control">
                                     @if(isset($data->photo))
                                         <img src="{{ asset('storage/' . $data->photo) }}" alt="Vehicle Photo" width="100" class="mt-2">
+                                    @endif
+                                </div>
+
+                                <!-- Brochure -->
+                                <div class="form-group mb-3">
+                                    <label for="brochure">Brochure</label>
+                                    <input type="file" id="brochure" name="brochure" class="form-control">
+                                    @if(isset($data->photo))
+                                        <a href="{{ asset('storage/' . $data->photo) }}" target="_blank" rel="noopener noreferrer">View</a>
                                     @endif
                                 </div>
                             </div>

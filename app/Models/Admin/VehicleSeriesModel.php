@@ -21,6 +21,7 @@ class VehicleSeriesModel extends Model
         'discount',
         'amount',
         'photo',
+        'brochure',
         'status',
     ];
 
