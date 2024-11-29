@@ -117,6 +117,7 @@ class MenuSeven implements MenuHandlerInterface
         $models = VehicleSeriesModel::where('series', $seriesName)
             ->whereNotNull('brochure')
             ->where('brochure', '<>', '')
+            ->where('status', true)
             ->get();
 
         if ($models->isEmpty()) {

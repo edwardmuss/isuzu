@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('session_id')->unique();
             $table->string('phone_number');
+            $table->string('ussd_menu')->nullable();
+            $table->string('ussd_string')->nullable();
             $table->json('data')->nullable(); // Store session data as JSON
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }

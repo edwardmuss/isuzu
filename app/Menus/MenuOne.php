@@ -8,7 +8,6 @@ use App\Models\Admin\VehicleSeriesModel;
 
 class MenuOne implements MenuHandlerInterface
 {
-
     public function handle(array $textArray, array &$sessionData, string $phoneNumber): string
     {
         $level = count($textArray);
@@ -31,17 +30,7 @@ class MenuOne implements MenuHandlerInterface
             $seriesName = $sessionData['series'] ?? null;
 
             if ($seriesName) {
-                $models = VehicleSeriesModel::where('series', $seriesName)->get();
-                $selectedModelIndex = (int)$textArray[2] - 1;
-
-                if (isset($models[$selectedModelIndex])) {
-                    $model = $models[$selectedModelIndex];
-                    $sessionData['model'] = $model;
-                    $response = "CON Enter your name:\n";
-                    $response .= "0: Back\n";
-                } else {
-                    $response = "END Invalid model selection. Please try again.";
-                }
+                $response = $this->handleModelSelection($textArray, $sessionData, $seriesName);
             } else {
                 $response = "END Session expired. Please start again.";
             }
@@ -81,7 +70,6 @@ class MenuOne implements MenuHandlerInterface
         return $response; // Return the response
     }
 
-
     // Function to display the vehicle series sub-menu
     function displaySeriesMenu()
     {
@@ -102,11 +90,14 @@ class MenuOne implements MenuHandlerInterface
     // Function to display the models sub-menu
     function displayModelsMenu($seriesName)
     {
-        $models = VehicleSeriesModel::where('series', $seriesName)->get();
+        $models = VehicleSeriesModel::where('series', $seriesName)->where('status', true)->get();
 
         if ($models->isEmpty()) {
             return "END No models available for this series.";
         }
+
+        // Reset collection keys to ensure correct indexing
+        $models = $models->values();
 
         $response = "CON Choose a Model: \n\n";
         foreach ($models as $index => $model) {
@@ -114,5 +105,21 @@ class MenuOne implements MenuHandlerInterface
         }
         $response .= "0: Back\n";
         return $response;
+    }
+
+    // Function to handle model selection
+    function handleModelSelection(array $textArray, array &$sessionData, string $seriesName)
+    {
+        $models = VehicleSeriesModel::where('series', $seriesName)->where('status', true)->get()->values();
+
+        $selectedModelIndex = (int)$textArray[2] - 1;
+
+        if (isset($models[$selectedModelIndex])) {
+            $model = $models[$selectedModelIndex];
+            $sessionData['model'] = $model;
+            return "CON Enter your name:\n";
+        }
+
+        return "END Invalid model selection. Please try again.";
     }
 }

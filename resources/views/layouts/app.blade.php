@@ -19,6 +19,14 @@
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
     @yield('css')
 
+    <style>
+        .form-control {
+        border: 1px solid #e2e2e4;
+        box-shadow: none;
+        color: #222;
+        font-size: 13px;
+    }
+    </style>
     <script type="text/javascript">
         var BASE_URL = {!! json_encode(url('/')) !!}
     </script>
@@ -154,10 +162,23 @@
                         <span>PSV AWARDS</span>
                     </a>
                 </li>
-                <li>
+                {{-- <li>
                     <a class="{{ isset($offers) ? 'active':null }}" href="{{route('offers.index')}}">
                         <i class="fa fa-gift"></i>
                         <span>OFFERS</span>
+                    </a>
+                </li> --}}
+
+                <li>
+                    <a class="{{ isset($loyalty) ? 'active':null }}" href="{{route('loyalties.index')}}">
+                        <i class="fa fa-gift"></i>
+                        <span>MAXIT</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="{{ isset($admin_users) ? 'active':null }}" href="{{route('users.index')}}">
+                        <i class="fa fa-group"></i>
+                        <span>ADMIN USERS</span>
                     </a>
                 </li>
 

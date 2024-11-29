@@ -105,7 +105,7 @@ class MenuTwo implements MenuHandlerInterface
     function displaySeriesMenu()
     {
         $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-        $response = "CON Book a Test Drive Vehicle Series: \n\n";
+        $response = "CON Choose a Vehicle Series: \n\n";
         $index = 1;
 
         foreach ($seriesList as $series) {
@@ -121,11 +121,14 @@ class MenuTwo implements MenuHandlerInterface
     // Function to display the models sub-menu
     function displayModelsMenu($seriesName)
     {
-        $models = VehicleSeriesModel::where('series', $seriesName)->get();
+        $models = VehicleSeriesModel::where('series', $seriesName)->where('status', true)->get();
 
         if ($models->isEmpty()) {
             return "END No models available for this series.";
         }
+
+        // Reset collection keys to ensure correct indexing
+        $models = $models->values();
 
         $response = "CON Choose a Model: \n\n";
         foreach ($models as $index => $model) {
@@ -133,5 +136,21 @@ class MenuTwo implements MenuHandlerInterface
         }
         $response .= "0: Back\n";
         return $response;
+    }
+
+    // Function to handle model selection
+    function handleModelSelection(array $textArray, array &$sessionData, string $seriesName)
+    {
+        $models = VehicleSeriesModel::where('series', $seriesName)->where('status', true)->get()->values();
+
+        $selectedModelIndex = (int)$textArray[2] - 1;
+
+        if (isset($models[$selectedModelIndex])) {
+            $model = $models[$selectedModelIndex];
+            $sessionData['model'] = $model;
+            return "CON Enter your name:\n";
+        }
+
+        return "END Invalid model selection. Please try again.";
     }
 }

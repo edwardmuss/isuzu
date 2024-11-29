@@ -11,11 +11,11 @@
             T:+254 703 013 222<br>
             Website: <a href="www.isuzu.co.ke">www.isuzu.co.ke</a><br>
             <span>
-                <img src="http://35.228.82.108/gmea/public/images/fb.png" style="width: 20px;height: auto"> IsuzuKenya
-                <img src="http://35.228.82.108/gmea/public/images/twitter.png" style="width: 20px;height: auto">
+                <img src="{{ asset('images/fb.png') }}" style="width: 20px;height: auto"> IsuzuKenya
+                <img src="{{ asset('images/twitter.png') }}" style="width: 20px;height: auto">
                 IsuzuKenya
             </span><br>
-            <!-- <img src="http://35.228.82.108/gmea/public/images/isuzu_footer.jpg" style="max-width: 624px;height: auto"> -->
+            <img src="{{ asset('images/isuzu_footer.jpg') }}" style="max-width: 624px;height: auto">
         </span>
     @endif
 </div>

@@ -15,6 +15,8 @@ use App\Http\Controllers\Dashboard\TechnicalController;
 use App\Http\Controllers\Dashboard\TestDrivesController;
 use App\Http\Controllers\Dashboard\VehicleSaleController;
 use App\Http\Controllers\Dashboard\LocateDealerController;
+use App\Http\Controllers\Dashboard\LoyaltyController;
+use App\Http\Controllers\Dashboard\UserController;
 use App\Http\Controllers\Dashboard\VehicleSeriesModelsController;
 
 /*Auth::routes();*/
@@ -43,6 +45,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/contact-request', ContactController::class);
     Route::resource('/psv-awards', PsvAwardsController::class);
     Route::resource('/offers', OffersController::class);
+    Route::resource('/loyalties', LoyaltyController::class);
+    Route::post('/loyalty-update-or-create', [LoyaltyController::class, 'updateOrCreate'])->name('loyalty.update-or-create');
+    Route::resource('/users', UserController::class);
 
     // Update routes
     Route::get('/service-update', [ServiceController::class, 'change'])->name('service_update');

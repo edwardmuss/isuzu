@@ -3,7 +3,7 @@
     <tr>
         <th style="min-width: 50px">@sortablelink('ID')</th>
         <th>@sortablelink('msisdn', 'Phone Number')</th>
-        <th>@sortablelink('ussd_menu', 'USSD Menu')</th>
+        {{-- <th>@sortablelink('ussd_menu', 'USSD Menu')</th> --}}
         <th style="min-width: 100px">@sortablelink('ussd_string', 'USSD String')</th>
         <th style="min-width: 110px">@sortablelink('created_at', 'Created At')</th>
         <th>Comment</th>
@@ -14,8 +14,8 @@
     @foreach($users as $user)
         <tr>
             <td>{{$user->id}}</td>
-            <td>{{$user->msisdn}}</td>
-            <td>{{$user->ussd_menu}}</td>
+            <td>{{$user->phone_number}}</td>
+            {{-- <td>{{$user->ussd_menu}}</td> --}}
             <td>{{$user->ussd_string}}</td>
             <td>{{date('d/m/Y', strtotime($user->created_at))}}</td>
             <td>{{$user->comment}}</td>

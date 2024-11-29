@@ -90,6 +90,7 @@ class VehicleSeriesModelsController extends Controller
             'amount' => 'nullable|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'brochure' => 'nullable|file|mimes:pdf|max:5120',
+            'status' => 'nullable|boolean',
         ]);
 
         $vehicleSeriesModel = VehicleSeriesModel::findOrFail($id);
@@ -109,6 +110,8 @@ class VehicleSeriesModelsController extends Controller
             }
             $validated['brochure'] = $request->file('brochure')->store('vehicle_brochures', 'public');
         }
+        // Set the status based on checkbox (1 = active, 0 = inactive)
+        $validated['status'] = $request->has('status') ? 1 : 0;
 
         $vehicleSeriesModel->update($validated);
 

@@ -39,8 +39,7 @@ class UssdController extends Controller
 
     function handleUssdRequest(Request $request)
     {
-        // header('Content-type: text/plain');
-
+        // Retrieve input data
         $text = $request->input('ussd_string') ?? $request->input('USSD_STRING') ?? $request->input('text');
         $phoneNumber = $request->input('msisdn') ?? $request->input('MSISDN') ?? $request->input('phoneNumber');
         $sessionId = $request->input('session_id') ?? $request->input('SESSION_ID') ?? $request->input('sessionId');
@@ -48,7 +47,12 @@ class UssdController extends Controller
         // Retrieve or create session
         $ussdSession = UssdSession::firstOrCreate(
             ['session_id' => $sessionId],
-            ['phone_number' => $phoneNumber, 'data' => json_encode([])]
+            [
+                'phone_number' => $phoneNumber,
+                'data' => json_encode([]),
+                'ussd_menu' => null, // Initialize these fields if not already present
+                'ussd_string' => null
+            ]
         );
 
         $sessionData = json_decode($ussdSession->data, true);
@@ -70,21 +74,25 @@ class UssdController extends Controller
             // Reset detected, clear session data and show main menu
             $sessionData = []; // Clear session data
             $ussdSession->data = json_encode($sessionData);
+            $ussdSession->ussd_menu = 'main_menu'; // Update with main menu name
+            $ussdSession->ussd_string = $text; // Save the original USSD string
             $ussdSession->save();
+
             $response = USSDHelper::displayMainMenu(); // Display main menu
         } else {
             // Dynamically call the menu handler based on the first menu option
             $menuOption = $textArray[0] ?? null;
-            Log::info("Menu Option: {$menuOption}");
+            // Log::info("Menu Option: {$menuOption}");
 
             if (is_numeric($menuOption) && $menuOption >= 1) {
                 $menuClass = "App\\Menus\\Menu" . ucfirst(USSDHelper::convertNumberToWord($menuOption));
-                Log::info("Menu Handler: {$menuClass}");
+                // Log::info("Menu Handler: {$menuClass}");
                 if (class_exists($menuClass)) {
                     $menuHandler = new $menuClass;
 
                     if ($menuHandler instanceof MenuHandlerInterface) {
                         $response = $menuHandler->handle($textArray, $sessionData, $phoneNumber);
+                        $ussdSession->ussd_menu = "menu_{$menuOption}"; // Save current menu name
                     } else {
                         $response = "END Menu handler for {$menuOption} is not valid.";
                     }
@@ -97,120 +105,26 @@ class UssdController extends Controller
             }
         }
 
-        // Save the session data
+        // Save the session data and USSD string
         $ussdSession->data = json_encode($sessionData);
+        $ussdSession->ussd_string = $text; // Save the original USSD string
         $ussdSession->save();
 
         return $response;
     }
 
-    function handleUssdRequest2(Request $request)
+    private function extractMenuOptions(string $response): array
     {
-        header('Content-type: text/plain');
+        // Split the response into lines and extract menu options
+        $lines = explode("\n", $response);
+        $menuOptions = [];
 
-        $text = $request->input('ussd_string') ?? $request->input('USSD_STRING') ?? $request->input('text');
-        $phoneNumber = $request->input('msisdn') ?? $request->input('MSISDN') ?? $request->input('phoneNumber');
-        $sessionId = $request->input('session_id') ?? $request->input('SESSION_ID') ?? $request->input('sessionId');
-
-        $ussdSession = UssdSession::firstOrCreate(
-            ['session_id' => $sessionId],
-            ['phone_number' => $phoneNumber, 'data' => json_encode([])]
-        );
-
-        $sessionData = json_decode($ussdSession->data, true);
-        $response = "";
-
-        $textArray = explode('*', $text);
-
-        // Handle "Back" and "Reset"
-        $textArray =  USSDHelper::backMenu($textArray);
-        $textArray = USSDHelper::mainMenu($textArray);
-
-        if (empty($textArray)) {
-            // Reset detected, clear session data and show main menu
-            $sessionData = []; // Clear session data
-            $ussdSession->data = json_encode($sessionData);
-            $ussdSession->save();
-            $response =  USSDHelper::displayMainMenu();
-        } else {
-            $level = count($textArray);
-
-            switch ($textArray[0]) {
-                case "1": // Vehicle Sales Menu
-                    if ($level == 1) {
-                        $response = $this->displaySeriesMenu();
-                    } elseif ($level == 2 && isset($textArray[1])) {
-                        $seriesList = VehicleSeriesModel::select('series')->distinct()->get();
-                        $selectedSeriesIndex = (int)$textArray[1] - 1;
-
-                        if (isset($seriesList[$selectedSeriesIndex])) {
-                            $seriesName = $seriesList[$selectedSeriesIndex]->series;
-                            $sessionData['series'] = $seriesName;
-                            $response = $this->displayModelsMenu($seriesName);
-                        } else {
-                            $response = "END Invalid series selection. Please try again.";
-                        }
-                    } elseif ($level == 3 && isset($textArray[2])) {
-                        $seriesName = $sessionData['series'] ?? null;
-
-                        if ($seriesName) {
-                            $models = VehicleSeriesModel::where('series', $seriesName)->get();
-                            $selectedModelIndex = (int)$textArray[2] - 1;
-
-                            if (isset($models[$selectedModelIndex])) {
-                                $model = $models[$selectedModelIndex];
-                                $sessionData['model'] = $model;
-                                $response = "CON Enter your name:";
-                                $response .= "0: Back\n";
-                            } else {
-                                $response = "END Invalid model selection. Please try again.";
-                            }
-                        } else {
-                            $response = "END Session expired. Please start again.";
-                        }
-                    } elseif ($level == 4 && isset($textArray[3])) {
-                        $name = trim($textArray[3]);
-
-                        if (strlen($name) < 2 || !preg_match("/^[a-zA-Z\s]+$/", $name)) {
-                            $response = "CON Invalid name. Please enter a valid name:";
-                            $response .= "0: Back\n";
-                        } else {
-                            $sessionData['name'] = $name;
-                            $response = "CON Enter your email address:";
-                            $response .= "0: Back\n";
-                        }
-                    } elseif ($level == 5 && isset($textArray[4])) {
-                        $email = trim($textArray[4]);
-
-                        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                            $response = "CON Invalid email address. Please enter a valid email:";
-                            $response .= "0: Back\n";
-                        } else {
-                            $sessionData['email'] = $email;
-
-                            $model = (object)$sessionData['model'];
-                            $name = $sessionData['name'];
-                            $description = $model->description;
-                            $image = $model->photo;
-                            USSDHelper::sendQuoteMessage($phoneNumber, $model, $name, $email);
-                            USSDHelper::sendEmail($email, $name, $phoneNumber, $model, $image, $description);
-
-                            $response = "END Thank you {$name}! We will send a quotation for {$model->new_model_name_customer} to {$email} shortly.";
-                        }
-                    } else {
-                        $response = "END Invalid input. Please try again.";
-                    }
-                    break;
-
-                default:
-                    $response = "END Invalid input. Please try again.";
+        foreach ($lines as $line) {
+            if (preg_match('/^\d+\.\s(.+)$/', $line, $matches)) {
+                $menuOptions[] = $matches[1]; // Extract the menu option text
             }
         }
 
-        // Save session data
-        $ussdSession->data = json_encode($sessionData);
-        $ussdSession->save();
-
-        return $response;
+        return $menuOptions;
     }
 }

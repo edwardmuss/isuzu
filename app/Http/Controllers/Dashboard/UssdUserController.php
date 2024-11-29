@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin\UssdUser;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\UssdSession;
 use Illuminate\Support\Facades\View;
 
 class UssdUserController extends Controller
@@ -28,7 +29,7 @@ class UssdUserController extends Controller
      * @param UssdUser $user
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, UssdUser $user)
+    public function index(Request $request, UssdSession $user)
     {
         $filters = $request->all();
         $users = DbHelper::create_query($user, $filters);
@@ -99,8 +100,7 @@ class UssdUserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        DB::table('tussdusers')->where("ID", $id)->update(['comment' => $request->comment]);
-        //$update = VehicleSale::updateorCreate(['ID'=>$id], [$request->all()]);
+        UssdSession::find($id)->update(['comment' => $request->comment]);
         return redirect()->back();
     }
 

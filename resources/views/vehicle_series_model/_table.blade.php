@@ -9,6 +9,7 @@
             <th>Price</th>
             <th>Discount</th>
             <th>Amount</th>
+            <th>@sortablelink('status', 'Status')</th>
             <th>@sortablelink('created_at', 'Created At')</th>
             <th>Photo</th>
             <th>Brochure</th>
@@ -26,6 +27,13 @@
             <td>{{ $data->price }}</td>
             <td>{{ $data->discount }}</td>
             <td>{{ $data->amount }}</td>
+            <td>
+                @if($data->status == true)
+                    <div class="btn btn-info btn-sm">Active</div>
+                @else
+                    <div class="btn btn-sm btn-danger">Inactive</div>
+                @endif
+            </td>
             <td>{{ date('d/m/Y', strtotime($data->created_at)) }}</td>
             <td>
                 @if($data->photo)
@@ -94,7 +102,7 @@
                                 <!-- Description -->
                                 <div class="form-group mb-3">
                                     <label for="description">Description</label>
-                                    <textarea id="description" name="description" class="form-control">{{ $data->description ?? old('description') }}</textarea>
+                                    <textarea id="description" name="description" rows="5" class="form-control">{{ $data->description ?? old('description') }}</textarea>
                                 </div>
                             
                                 <!-- Price -->
@@ -119,6 +127,7 @@
                                 <div class="form-group mb-3">
                                     <label for="photo">Photo</label>
                                     <input type="file" id="photo" name="photo" class="form-control">
+                                    <br>
                                     @if(isset($data->photo))
                                         <img src="{{ asset('storage/' . $data->photo) }}" alt="Vehicle Photo" width="100" class="mt-2">
                                     @endif
@@ -131,6 +140,20 @@
                                     @if(isset($data->photo))
                                         <a href="{{ asset('storage/' . $data->photo) }}" target="_blank" rel="noopener noreferrer">View</a>
                                     @endif
+                                </div>
+
+                                <!-- Status Checkbox -->
+                                <div class="form-group mb-3">
+                                    <label for="status">Status: </label>
+                                    <input type="checkbox" id="status" name="status" class="form-check-input"
+                                        value="1" {{ old('status', $data->status) == 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="status">
+                                        @if(old('status', $data->status) == 1)
+                                            Active
+                                        @else
+                                            Inactive
+                                        @endif
+                                    </label>
                                 </div>
                             </div>
                             <!-- Modal Footer -->

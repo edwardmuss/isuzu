@@ -134,7 +134,7 @@
                     <!-- Description -->
                     <div class="form-group mb-3">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description" class="form-control">{{ old('description') }}</textarea>
+                        <textarea id="description" name="description" rows="5" class="form-control">{{ old('description') }}</textarea>
                     </div>
                 
                     <!-- Price -->
