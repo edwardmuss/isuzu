@@ -30,6 +30,9 @@
                 {{$data->dealer}}
             </td>
             <td>
+                <a class="btn btn-sm btn-success" href="{{ asset("storage/quotes/S" . $data->quote_number . ".pdf") }}" target="_blank" rel="noopener noreferrer">PDF</a>
+            </td>
+            <td>
                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#{{$data->id}}">
                     <i class="fa fa-edit"></i>
                 </button>

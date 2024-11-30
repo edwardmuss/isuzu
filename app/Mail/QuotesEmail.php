@@ -46,9 +46,9 @@ class QuotesEmail extends Mailable
             'proforma' => $this->quote,
             'image' => $this->image
         ]);
-        $pdf->save(base_path("storage/quotes/S" . $this->quote . ".pdf"));
+        $pdf->save(storage_path("app/public/quotes/S" . $this->quote . ".pdf"));
         $subject = "ISUZU " . $this->model->new_model_name_customer . " Quote";
         return $this->view('emails.quote.welcome')->subject($subject)
-            ->attach(base_path("storage/quotes/S" . $this->quote . ".pdf"));
+            ->attach(storage_path("app/public/quotes/S" . $this->quote . ".pdf"));
     }
 }

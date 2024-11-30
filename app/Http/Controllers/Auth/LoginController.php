@@ -41,15 +41,16 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-
-
+        // Log out the authenticated user
         $this->guard()->logout();
 
+        // Invalidate the user's session
         $request->session()->invalidate();
 
+        // Regenerate the CSRF token
         $request->session()->regenerateToken();
 
-        // return $this->loggedOut($request) ?: view('auth.auth-logout');
-        // return view('auth.auth-logout');
+        // Redirect to the login page or a custom logout page
+        return redirect()->route('login')->with('success', 'You have been logged out successfully.');
     }
 }
