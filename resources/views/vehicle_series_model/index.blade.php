@@ -83,6 +83,9 @@
                         <label for="file">Select Excel File:</label>
                         <input type="file" name="file" class="form-control">
                     </div>
+                    <div class="form-group">
+                        <p>Download a the <a href="{{ asset('templates/USSD Price updates -2023.xlsx') }}">Excel template here</a></p>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success"><i class="fa fa-upload"></i> Upload</button>
