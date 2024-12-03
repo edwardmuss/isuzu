@@ -44,7 +44,7 @@ class QuotesEmail extends Mailable
             'phone' => $this->phone,
             'email' => $this->to_mail,
             'proforma' => $this->quote,
-            'image' => $this->image
+            'image' => $this->image ?? asset('apple-touch-icon.png')
         ]);
         $pdf->save(storage_path("app/public/quotes/S" . $this->quote . ".pdf"));
         $subject = "ISUZU " . $this->model->new_model_name_customer . " Quote";
