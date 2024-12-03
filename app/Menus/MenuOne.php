@@ -57,7 +57,7 @@ class MenuOne implements MenuHandlerInterface
                 $model = (object)$sessionData['model'];
                 $name = $sessionData['name'];
                 $description = $model->description;
-                $image = $model->photo;
+                $image = $model->photo ?? asset('apple-touch-icon.png');
                 USSDHelper::sendQuoteMessage($phoneNumber, $model, $name, $email);
                 USSDHelper::sendEmail($email, $name, $phoneNumber, $model, $image, $description);
 
