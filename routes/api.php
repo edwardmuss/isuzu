@@ -8,5 +8,5 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/ussd', [UssdController::class, 'handleUssdRequest']);
+Route::any('/ussd', [UssdController::class, 'handleUssdRequest']);
 // Route::post('/ussd', [UssdController::class, 'handleUssdRequest']);
